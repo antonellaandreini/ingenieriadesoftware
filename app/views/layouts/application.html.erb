@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="shortcut icon" href="http://www.iconj.com/ico/k/x/kx5bc3q0j6.ico" type="image/x-icon" />
+  <title>Gauchada</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+<%= render 'layouts/header' %>
+
+
+<div class="container">
+
+  <%= image_tag "header.png", title: "Header", class: "img-responsive" %>
+
+
+  <% if flash[:alert] %>
+    <div class="alert alert-warning"> <%= flash[:alert] %> </div>
+  <% end %>
+  <% if flash[:notice] %>
+    <div class="alert alert-warning"> <%= flash[:notice] %> </div>
+  <% end %>
+
+  <%= yield %>
+
+</div>
+
+</body>
+</html>

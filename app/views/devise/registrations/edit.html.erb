@@ -1,0 +1,60 @@
+<div class="row">
+ <div class="col-md-6 col-md-offset-3">
+
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title text-center">Editar <%= resource_name.to_s.humanize %></h3>
+      </div>
+      <div class="panel-body">
+
+
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+  <%= devise_error_messages! %>
+
+  <div class="field">
+    <%= f.label :email %><br />
+    <%= f.email_field :email, autofocus: true , class:"form-control" %>
+  </div>
+
+  <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+    <div>Currently waiting confirmation for: <%= resource.unconfirmed_email %></div>
+  <% end %>
+  <div class="field">
+    <%= f.label :imagen %><i>(Opcional: ingrese una dirección a una imagen para usar como avatar)</i><br />
+    <%= f.text_field :imagen , class:"form-control"%>
+  </div>
+  <div class="field">
+    <%= f.label :telefono %><i>(Opcional: ingrese un número de teléfono para ser contactado)</i><br />
+    <%= f.text_field :telefono , class:"form-control"%>
+  </div>
+  <div class="field">
+    <%= f.label :ubicacion %><i>(Opcional: ingrese la ciudad donde reside)</i><br />
+    <%= f.text_field :ubicacion , class:"form-control"%>
+  </div>
+
+  <div class="field">
+    <%= f.label :password %> <i>(Dejar en blanco si no desea cambiar)</i><br />
+    <%= f.password_field :password, autocomplete: "off", class:"form-control" %>
+    <% if @minimum_password_length %>
+      <br />
+      <em><%= @minimum_password_length %> caracteres minimo</em>
+    <% end %>
+  </div>
+
+  <div class="field">
+    <%= f.label :password_confirmation %><br />
+    <%= f.password_field :password_confirmation, autocomplete: "off", class:"form-control" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :current_password %> <i>(Necesita ingresar su contraseña para confirmar los cambios)</i><br />
+    <%= f.password_field :current_password, autocomplete: "off", class:"form-control" %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Actualizar",:class=>'btn btn-warning' %>
+  </div>
+<% end %>
+
+<%= link_to "Atras", :back %>
+</div>

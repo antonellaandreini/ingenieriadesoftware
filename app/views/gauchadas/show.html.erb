@@ -1,0 +1,278 @@
+<div class="row">
+  <div class="col-md-6">
+    <% usuario=User.find(@gauchada.user_id) %>
+    <% if Logro.count==1 %>
+      <% @l=Logro.all[0] %>
+    <%else%>
+    <% @logro=Logro.all %>
+    <% @l=@logro[0] %>
+    <% @logro.each do |logro| %>
+    <% if logro.puntuacion <= usuario.puntuacion %>
+        <% @l=logro %>
+        <% end %>
+    <% end %>
+    <%end %>
+<div class="row">
+        <div class="col-xs-12 col-sm-8 col-md-8">
+            <div class="well well-sm">
+                <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                      <% if usuario.imagen != nil %>
+                          <%= image_tag usuario.imagen, size:"150x200", class: "img-rounded img-responsive"%>
+                      <% else %>
+                       <img src="http://static.topixcdn.com/pics/user_avatar_empty.png" alt="" class="img-rounded img-responsive" >
+                       <% end %>
+                    </div>
+                    <div class="col-sm-6 col-md-8">
+                        <h4><%= usuario.nombre %></h4>
+                        <small><cite><font color="#f0ad4e"><%=@l.estado %></font> </cite></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  <div class="row">
+    <div class="col-md-12 ">
+    <% if user_signed_in? and current_user.id == @gauchada.user_id %>
+      <% if @gauchada.postulacions.any? == false %>
+          <p>Todavía no hay postulaciones</p>
+      <% else %>
+
+        <table class="table table-striped" >
+        	<tr>
+        		<th> Usuario </th>
+            <th> Reputación </th>
+        		<th> Fecha de realización </th>
+            <th> Comentario </th>
+        		<th> Acciones </th>
+        	</tr>
+        <tr>
+
+          <% @gauchada.postulacions.each do |post| %>
+          <% us=User.find(post.user_id) %>
+      		<td> <%= us.nombre %></td>
+      		<td><% if Logro.count==1 %>
+                <% @repu= Logro.find(1) %>
+              <%else%>
+              <% @log=Logro.all %>
+                <% @log.each do |logr| %>
+          <% if logr.puntuacion <= us.puntuacion %>
+              <% @repu=logr %>
+            <% end %>
+          <% end %>
+          <%end %>
+          <cite><font color="#f0ad4e"><%= @repu.estado %></font> </cite>
+          </td>
+          <td> <%= post.fechaderealizacion %> </td>
+         <td ><%= post.comentarios %></td>
+      		<td> <% if post.estado == "Esperando" %>
+              <%= link_to "Aceptar", postulacion_aceptar_path(id:post.id), class: 'btn btn-block btn-warning' %>
+    				  <%= link_to "Rechazar", postulacion_rechazar_path(id:post.id), class: 'btn btn-block btn-danger' %>
+              <%else %>
+                <cite><font color="#f0ad4e"><%=post.estado %></font> </cite>
+              <% end %>
+      		</td>
+      	</tr>
+          <%end%>
+      </table>
+
+      <% end %>
+    <%end %>
+  </div>
+  </div>
+
+  </div>
+                <div class="col-md-6 text-center">
+                    <div class="box">
+                        <div class="box-content">
+                            <h1 class="tag-title"><%= @gauchada.titulo %></h1>
+                            <hr />
+                            <% if (@gauchada.imagen != nil) && (@gauchada.imagen != "")%>
+                            <p ALIGN=CENTER><%= image_tag @gauchada.imagen, size:"600x400"%></p>
+                            <% else %>
+                            <p ALIGN=CENTER><img src="http://mgiep.unesco.org/wp-content/plugins/ajax-search-lite/img/default.jpg" size="300x300" class="img-responsive"></p>
+                            <%end %>
+                            <p><%= @gauchada.descripcion %></p>
+                            <br />
+                            <% if @gauchada.cumplida %>
+                              <h6> La gauchada se encuentra cumplida </h6>
+                              <% if @gauchada.calificacion == nil %>
+                                <% if @gauchada.user_id == current_user.id %>
+                                  <%= form_for @gauchada, url: calificar_gauchada_path, method: :post do |g| %>
+                                  <div class="form-group">
+                                  <%= "Calificar Gauchada" %>
+                                  </div>
+                                  <div class="form-group">
+                                  <%= "Positivo" %>
+                                  <% g.label :calificacion %>
+                                  <%= g.radio_button :calificacion, 'positivo', checked: true %>
+                                  <%= "Negativo" %>
+                                  <% g.label :calificacion %>
+                                  <%= g.radio_button :calificacion, 'negativo' %>
+                                  <% g.label :comentariocal %>
+                                  <%= g.text_area :comentariocal,:placeholder=>'Comentarios Sobre El Postulante. ¿Fue Amable? ¿Cumplio Con Todo?', class:"form-control"  %>
+                                  </div>
+                                  <%= g.submit 'Guardar', data: {confirm: "¿Estas seguro?"} , :class=>'btn btn-warning' %>
+                                  <%end%>
+                                  <%end%>
+                                  <% if @gauchada.postulacions[0] != nil && @gauchada.postulacions[0].user_id == current_user.id %>
+                                    <h6> Todavia no te calificaron </h6>
+                                  <%end%>
+                              <%else%>
+                                <% if @gauchada.user_id == current_user.id %>
+                                  <div class="container-fluid">
+                                  <%= "Calificaste " +  @gauchada.calificacion %>
+                                  </div>
+                                  <div class="container-fluid">
+                                  <% if @gauchada.comentariocal != "" %>
+                                  <%= "Tu comentario: " + @gauchada.comentariocal %>
+                                  </div>
+                                  <%end%>
+                                  <%end%>
+                                  <%end%>
+                                <% if @gauchada.postulacions[0] != nil && @gauchada.postulacions[0].user_id == current_user.id %>
+                                    <div class="container-fluid">
+                                    <%= "Te calificaron " +  @gauchada.calificacion %>
+                                    </div>
+                                    <div class="container-fluid">
+                                    <% if @gauchada.comentariocal != nil %>
+                                    <%= "Comentario: " + @gauchada.comentariocal %>
+                                    </div>
+                                    <%end%>
+                                  <%end%>
+                            <%else %>
+                                <h6> La gauchada no se encuentra cumplida </h6>
+
+                                <% if user_signed_in? and current_user.id == @gauchada.user_id %>
+                                  <td>
+                                  <% if !(@gauchada.postulacions.where(estado:"Aceptada").any?) %>
+                                    <%= link_to "Editar", edit_gauchada_path(@gauchada),  class: "btn btn-block btn-warning" %>
+                                    <%= link_to "Eliminar", @gauchada, method: :delete, data: {confirm: "¿Estas seguro?"} ,  class: "btn btn-block btn-danger" %>
+                                  <% else %>
+                                    <%= link_to "Marcar como realizada", realizar_path(:id =>@gauchada.id ), class: "btn btn-block btn-success" %>
+                                    <%end%>
+                                  </td>
+                                <% else %>
+                                   <% if user_signed_in? && @gauchada.postulacions.where(user:current_user).any? %>
+                                      <% if @gauchada.postulacions.where(user:current_user)[0].estado == "Esperando" %>
+                                       <%= link_to "Eliminar postulacion", @gauchada.postulacions.where(user:current_user)[0], method: :delete, class: 'btn btn-block btn-danger' %>
+                                       <%else%>
+                                            <% if @gauchada.postulacions.where(user:current_user)[0].estado == "Rechazada" %>
+                                              <h5> Tu postulación ha sido rechazada </h5>
+                                            <%else%>
+                                                <h5> Tu postulación fue aceptada! En tu mail podrás encontrar los datos de contacto del usuario</h5>
+                                            <%end%>
+                                       <%end%>
+                                    <% else %>
+                                      <% if user_signed_in? && !(@gauchada.postulacions.where(estado:"Aceptada").any?) %>
+                                       <%= link_to "Postularse", new_postulacion_path(gauchadaid:@gauchada), class: 'btn btn-block btn-warning' %>
+                                       <% else %>
+                                          <h6> Ya se ha aceptado una postulación para esta gauchada. </h6>
+                                       <% end %>
+                                    <% end %>
+                                <% end %>
+                              <% end %>
+
+                    </div>
+                  </div>
+                  <hr />
+                  <div class="container">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+          Comentarios
+        </div>
+        <div class="panel-body comments">
+                  <% if user_signed_in? && !(@gauchada.cumplida) && !(@gauchada.postulacions.where(estado:"Aceptada").any?)  %>
+                   <% if !(@gauchada.user_id == current_user.id) %>
+                    <%= form_tag '/comentario' do %>
+                    <div class="form-group">
+                      <%= hidden_field_tag :gauchada_id, @gauchada.id %>
+                      <%= label_tag :cuerpo, 'Nuevo comentario' %>
+                      <%= text_area_tag :cuerpo, params[:cuerpo], placeholder: 'Comentario', required: true, class:"form-control" %>
+                    </div>
+                    <%= submit_tag 'Enviar',:class=>'btn btn-warning' %>
+                  <% end %>
+                  <% end %>
+                  <% else %>
+                  <% if !(@gauchada.cumplida) && !(@gauchada.postulacions.where(estado:"Aceptada").any?) %>
+                    <h5> Debes <%= link_to "Iniciar sesión", new_user_session_path %> para poder realizar comentarios </h5>
+                  <% end %>
+                  <% end %>
+				  <% if @gauchada.pregunta.size == 0 %>
+                    <h4> No hay comentarios aun para esta gauchada </h4>
+                  <% else %>
+          <div class="clearfix"></div>
+          <hr>
+		    <% @gauchada.pregunta.order(:created_at).reverse_order.each do |c| %>
+                <% user=User.find(c.user_id) %>
+          <ul class="media-list">
+            <li class="media">
+              <div class="comment">
+                <a href="#" class="pull-left">
+                  <% if user.imagen != nil %>
+                          <%= image_tag user.imagen, size:"50x75",  class: "img-circle"%>
+                      <% else %>
+                       <img src="http://static.topixcdn.com/pics/user_avatar_empty.png" alt="" height="75" width="75" class="img-circle" >
+                       <% end %>
+                </a>
+                <div class="media-body">
+                  <strong class="text-warning"><%= user.nombre %></strong>
+                  <span class="text-muted">
+                  <small class="text-muted"><%= c.fecha %></small>
+                  </span>
+                  <p>
+                    <%= c.cuerpo %>
+                  </p>
+                </div>
+                <div class="clearfix"></div>
+              </div>
+			  <% if c.respuesta == nil %>
+                        <% if user_signed_in? && @gauchada.user_id == current_user.id %>
+                        <%= form_tag '/respuesta' do %>
+                        <div class="form-group">
+                          <%= hidden_field_tag :id, c.id %>
+                          <%= label_tag :respuesta, 'Responder' %>
+                          <%= text_area_tag :respuesta, params[:respuesta], placeholder: 'Respuesta', required: true, class:"form-control" %>
+                        </div>
+                        <%= submit_tag 'Enviar',:class=>'btn btn-warning' %>
+                        <% end %>
+                        <%end %>
+                      <% else %>
+              <ul class="media-list">
+                <li class="media">
+                  <div class="comment">
+                    <a href="#" class="pull-left">
+                      <% if usuario.imagen != nil %>
+                              <%= image_tag usuario.imagen, size:"50x75",  class: "img-circle"%>
+                          <% else %>
+                           <img src="http://static.topixcdn.com/pics/user_avatar_empty.png" alt="" height="75" width="75" class="img-circle" >
+                           <% end %>
+                    </a>
+                    <div class="media-body">
+                      <strong class="text-warning"> <%=usuario.nombre %></strong>
+                      <p>
+                        <%= c.respuesta %>
+                      </p>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                </li>
+                </ul>
+				<%end %>
+
+          </ul>
+
+                  <% end %>
+                  <% end %>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+                  </div>
+
+</div>
